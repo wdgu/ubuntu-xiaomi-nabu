@@ -107,4 +107,4 @@ rm -d rootdir
 
 echo 'cmdline for legacy boot: "root=PARTLABEL=linux"'
 
-7zz a rootfs.7z rootfs.img
+7z a rootfs.7z rootfs.img
