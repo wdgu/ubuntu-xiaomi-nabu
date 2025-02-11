@@ -1,7 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-
 name: rootfs
-
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
@@ -9,57 +7,30 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  kernel:
-    runs-on: ubuntu-latest
-    strategy:
-            matrix:
-                version: [6.7-working]
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-        
-      - name: Install Dependencies
-        run: sudo apt update && sudo apt install build-essential gcc-aarch64-linux-gnu bc flex bison 7zip kmod bash cpio binutils tar git wget dpkg libssl-dev
-
-      - name: Build kernel
-        run: sudo sh nabu-kernel_build.sh ${{ matrix.version }}
-
-      - name: Upload deb packages
-        uses: actions/upload-artifact@v4.0.0
-        with:
-          # Artifact name
-          name: xiaomi-nabu-debs_${{ matrix.version }}
-          path: ${{ github.workspace }}/*.deb
-          
   rootfs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    needs: kernel
     strategy:
-            matrix:
-                desktop: [ubuntu-desktop]
-                kernel: [6.7-working]
+      matrix:
+        desktop: [ubuntu-desktop]
+        kernel: [6.7-working]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: xiaomi-nabu-debs*
       - name: Install Dependencies
         run: sudo apt update && sudo apt install unzip build-essential gcc-aarch64-linux-gnu bc flex bison 7zip kmod bash cpio binutils tar git wget dpkg libssl-dev
-
+      - name: Download pre-built kernel
+        run: |
+          # 替换为你实际的下载链接，这里假设你将文件上传到了 GitHub Releases
+          wget -O xiaomi-nabu-debs_${{ matrix.kernel }}.zip https://github.com/wdgu/ubuntu-xiaomi-nabu/releases/download/rootfs/xiaomi-nabu-debs_${{ matrix.kernel }}.zip
+          unzip xiaomi-nabu-debs_${{ matrix.kernel }}.zip
       - name: Build rootfs
         run: sudo sh nabu-rootfs_build.sh ${{ matrix.desktop }} ${{ matrix.kernel }}
-
       - name: Upload rootfs.7z
         uses: actions/upload-artifact@v4.0.0
         with:
