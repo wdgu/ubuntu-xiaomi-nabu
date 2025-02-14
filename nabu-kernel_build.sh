@@ -13,7 +13,7 @@ rm -rf ../linux-xiaomi-nabu/lib
 make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=../linux-xiaomi-nabu modules_install
 rm ../linux-xiaomi-nabu/lib/modules/**/build
 cd ..
-rm -rf linux
+#rm -rf linux
 
 dpkg-deb --build --root-owner-group linux-xiaomi-nabu
 dpkg-deb --build --root-owner-group firmware-xiaomi-nabu
