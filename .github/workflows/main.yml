@@ -34,10 +34,9 @@ jobs:
 
       - name: Generate zImage and boot image
         run: |
-          _kernel_version=$(make -C linux kernelrelease -s)
+          _kernel_version=$(cat kernel_version.txt)
           cat linux-xiaomi-nabu/boot/vmlinuz-$_kernel_version linux-xiaomi-nabu/boot/dtb-$_kernel_version > zImage
           mkbootimg --kernel zImage --cmdline "root=PARTLABEL=linux loglevel=3" --base 0x00000000 --kernel_offset 0x00008000 --tags_offset 0x00000100 --pagesize 4096 --id -o linux.boot.img
-
       - name: Upload boot image
         uses: actions/upload-artifact@v4.0.0
         with:
